@@ -15,15 +15,15 @@ Facilitar la personalización del aprendizaje en Ciencias de la Computación med
 
 El sistema se organiza en los siguientes módulos:
 
-- `📂 data/`: Archivos de entrada, Excel clasificado y resultados del análisis estadístico.
-- `📂 Recursos/`: Recursos brutos, preprocesados y fichas validadas.
-- `📂 resultados/`: Evaluaciones cruzadas, outputs de revisión y puntuaciones.
-- `📂 revision/`: Scripts de revisión sistemática con Elicit.
-- `interfaz_optimizado.py`: Interfaz principal de Streamlit.
-- `revision_sistematica.py`: Validación automatizada de la clasificación.
-- `tiempos.py`: Medición del tiempo de respuesta por modelo.
-- `validacion_resultado.xlsx`: Validación cruzada y rúbrica aplicada.
-- `README.md`: Este documento.
+- `📂 data/`: (...)
+- `📂 docs/`(...)
+- `📂 evaluacion/`(...)
+- `📂 recursos_raw/`(...)
+- `📂 resultados/`(...)
+- `📂 scripts/`(...)
+- LICENSE.md
+- README.md
+- requirements.md
 
 ## 🚀 Instalación
 
