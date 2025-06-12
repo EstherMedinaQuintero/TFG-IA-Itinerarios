@@ -87,9 +87,9 @@ def validar_clasificacion(revision_df, clasificacion_df):
     return pd.DataFrame(resultados)
 
 def main():
-    carpeta_revision = "revision"
-    archivo_clasificacion = "./data/OutputEditado.xlsx"
-    carpeta_salida = "resultados"
+    carpeta_revision = "revision" # CAMBIAR A LA CARPETA DE REVISIÓN
+    archivo_clasificacion = "../../data/recursos_clasificados.xlsx"
+    carpeta_salida = "resultados" # CAMBIAR A LA CARPETA DE RESULTADOS
 
     os.makedirs(carpeta_salida, exist_ok=True)
 

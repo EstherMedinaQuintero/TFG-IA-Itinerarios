@@ -177,7 +177,7 @@ if __name__ == "__main__":
     # Punto de entrada del script
     print("Inicializando el asistente...\n")
 
-    documents = load_documents_from_excel("./data")
+    documents = load_documents_from_excel("../../data")
     vector_store = build_vectorstore(documents)
     qa_chain, model_name = create_retriever_chain(vector_store)
     generate_markdown_responses(qa_chain, model_name)

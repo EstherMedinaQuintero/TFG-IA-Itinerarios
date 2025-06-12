@@ -239,7 +239,7 @@ def main() -> None:
     Flujo principal: carga datos, selecciona criterios, genera prompt y pregunta.
     """
     # Cargar documentos y construir cadena
-    docs = load_documents_from_excel("./data")
+    docs = load_documents_from_excel("../../data")
     chain = build_chain(docs)
 
     # Selección interactiva de criterios

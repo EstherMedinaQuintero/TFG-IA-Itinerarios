@@ -125,7 +125,7 @@ st.set_page_config(page_title="Constructor de Itinerarios", layout="wide")
 st.title("🧩 Constructor de Itinerarios Formativos")
 
 # Carga temprana de documentos
-docs = load_documents_from_excel("./data")
+docs = load_documents_from_excel("../../data")
 
 # Barra lateral: selección de modelo y criterios
 st.sidebar.header("Configuración del LLM")

@@ -175,7 +175,7 @@ if st.sidebar.button("Generar Itinerario"):
         st.code(prompt_text, language="markdown")
 
         with st.spinner(f"Invocando al modelo {selected_model}…"):
-            docs = load_documents_from_excel("./data")
+            docs = load_documents_from_excel("../../data")
             qa_chain = build_chain(docs, selected_model)
             raw_response = qa_chain.invoke(prompt_text)
 

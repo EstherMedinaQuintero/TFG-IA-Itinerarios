@@ -129,7 +129,7 @@ if __name__ == "__main__":
     # Punto de entrada del script
     print("Inicializando el asistente...\n")
 
-    docs = load_documents_from_excel("./data")
+    docs = load_documents_from_excel("../../data")
     vectorstore = build_vectorstore(docs)
     chain = create_retriever_chain(vectorstore)
     handle_conversation(chain)

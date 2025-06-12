@@ -92,7 +92,7 @@ def main() -> None:
     5) Guardar tiempos y respuestas en CSV y Markdown.
     """
     # 1) Cargar datos y construir el índice
-    docs = load_documents_from_excel("./data")
+    docs = load_documents_from_excel("../../data")
     vectorstore = build_vectorstore(docs)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 

@@ -24,7 +24,7 @@ El sistema se organiza en los siguientes módulos:
 - **`📂 documents/`**: Recursos y evaluaciones utilizadas en el desarrollo del sistema.
 - **`📂 results/`**: Resultados obtenidos tras la evaluación de los modelos y tiempos de ejecución.
 - **`📂 code/scripts/`**: Scripts principales para la generación de itinerarios, interfaz y evaluación.
-- **`📂 code/notebooks/`**: Notebooks para análisis exploratorio y estadístico.
+- **`📂 code/notebooks/`**: Notebooks para análisis estadístico y columna de URLs.
 
 Archivos principales:
 
@@ -67,7 +67,7 @@ Archivos principales:
 
 ## 🤖 Modelos utilizados
 
-Los siguientes modelos se integran con Ollama y se ejecutan en local con un mínimo de 8 GB de RAM:
+Los siguientes modelos se integran con Ollama y se ejecutan en local con un mínimo de 8GB de RAM:
 
 - **`phi3`**
 - **`llama3.2`**
