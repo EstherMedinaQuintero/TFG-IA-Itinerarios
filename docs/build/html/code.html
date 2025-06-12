@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Code &#8212; documentación de Generador de itinerarios formativos - 1</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=92345faf"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Data" href="data.html" />
+    <link rel="prev" title="Welcome to TFG-IA-Itinerarios’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="code">
+<h1>Code<a class="headerlink" href="#code" title="Link to this heading">¶</a></h1>
+<p>This section contains information about the code structure.</p>
+<section id="notebooks">
+<h2>Notebooks<a class="headerlink" href="#notebooks" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><cite>enlaces.ipynb</cite>: Contains link analysis.</p></li>
+<li><p><cite>recursos_estadisticas.ipynb</cite>: Resource statistics.</p></li>
+</ul>
+</section>
+<section id="module-chat">
+<span id="scripts"></span><h2>Scripts<a class="headerlink" href="#module-chat" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="chat.build_vectorstore">
+<span class="sig-prename descclassname"><span class="pre">chat.</span></span><span class="sig-name descname"><span class="pre">build_vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">FAISS</span></span></span><a class="reference internal" href="_modules/chat.html#build_vectorstore"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#chat.build_vectorstore" title="Link to this definition">¶</a></dt>
+<dd><p>Genera embeddings y construye el índice FAISS.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>docs (List[Any]): Documentos a indexar.</p>
+</dd>
+<dt>Returns:</dt><dd><p>FAISS: Índice FAISS construido con los embeddings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chat.create_retriever_chain">
+<span class="sig-prename descclassname"><span class="pre">chat.</span></span><span class="sig-name descname"><span class="pre">create_retriever_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vectorstore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FAISS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">RetrievalQA</span></span></span><a class="reference internal" href="_modules/chat.html#create_retriever_chain"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#chat.create_retriever_chain" title="Link to this definition">¶</a></dt>
+<dd><p>Configura la cadena RetrievalQA con un retriever FAISS y un LLM de Ollama.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>vectorstore (FAISS): Índice FAISS con embeddings de documentos.</p>
+</dd>
+<dt>Returns:</dt><dd><p>RetrievalQA: Cadena configurada para consultas y recuperación de contexto.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chat.handle_conversation">
+<span class="sig-prename descclassname"><span class="pre">chat.</span></span><span class="sig-name descname"><span class="pre">handle_conversation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RetrievalQA</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/chat.html#handle_conversation"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#chat.handle_conversation" title="Link to this definition">¶</a></dt>
+<dd><p>Inicia un bucle de conversación con el usuario en la terminal.</p>
+<p>Solicita entradas de usuario, muestra contexto recuperado y la respuesta del LLM.
+El bucle finaliza cuando el usuario escribe “salir” o “exit”.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>chain (RetrievalQA): Cadena de recuperación para generar respuestas.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chat.load_documents_from_excel">
+<span class="sig-prename descclassname"><span class="pre">chat.</span></span><span class="sig-name descname"><span class="pre">load_documents_from_excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/chat.html#load_documents_from_excel"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#chat.load_documents_from_excel" title="Link to this definition">¶</a></dt>
+<dd><p>Carga y prepara documentos desde archivos Excel en un directorio.</p>
+<p>Cada archivo .xlsx se lee en un DataFrame de pandas, se rellenan los valores
+faltantes con cadenas vacías, y se crea una columna “content” que concatena
+todas las columnas como texto. Los documentos se extraen usando DataFrameLoader.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): Ruta al directorio que contiene archivos .xlsx.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List[Any]: Lista de objetos documento listos para indexar.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-interfaz">
+<dt class="sig sig-object py" id="interfaz.build_chain">
+<span class="sig-prename descclassname"><span class="pre">interfaz.</span></span><span class="sig-name descname"><span class="pre">build_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_documents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">RetrievalQA</span></span></span><a class="reference internal" href="_modules/interfaz.html#build_chain"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#interfaz.build_chain" title="Link to this definition">¶</a></dt>
+<dd><p>Construye la cadena RetrievalQA con FAISS y embeddings de Ollama.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>documents (list): Documentos a indexar.
+model_name (str): Nombre del modelo Ollama.</p>
+</dd>
+<dt>Returns:</dt><dd><p>RetrievalQA: Objeto configurado para consultas.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interfaz.build_prompt">
+<span class="sig-prename descclassname"><span class="pre">interfaz.</span></span><span class="sig-name descname"><span class="pre">build_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/interfaz.html#build_prompt"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#interfaz.build_prompt" title="Link to this definition">¶</a></dt>
+<dd><p>Genera el prompt en Español basado en las selecciones del usuario.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>selections (dict): Mapeo de categoría a opciones seleccionadas.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Prompt formateado para enviar al modelo.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interfaz.load_documents_from_excel">
+<span class="sig-prename descclassname"><span class="pre">interfaz.</span></span><span class="sig-name descname"><span class="pre">load_documents_from_excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/interfaz.html#load_documents_from_excel"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#interfaz.load_documents_from_excel" title="Link to this definition">¶</a></dt>
+<dd><p>Carga documentos de archivos Excel y genera una lista de documentos.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): Ruta al directorio con archivos .xlsx.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list: Documentos extraídos con DataFrameLoader.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-tiempos">
+<dt class="sig sig-object py" id="tiempos.build_vectorstore">
+<span class="sig-prename descclassname"><span class="pre">tiempos.</span></span><span class="sig-name descname"><span class="pre">build_vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">FAISS</span></span></span><a class="reference internal" href="_modules/tiempos.html#build_vectorstore"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#tiempos.build_vectorstore" title="Link to this definition">¶</a></dt>
+<dd><p>Genera embeddings usando OllamaEmbeddings y crea un vectorstore FAISS.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>docs (list): Lista de documentos a indexar.</p>
+</dd>
+<dt>Returns:</dt><dd><p>FAISS: Índice FAISS construido a partir de los embeddings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiempos.load_documents_from_excel">
+<span class="sig-prename descclassname"><span class="pre">tiempos.</span></span><span class="sig-name descname"><span class="pre">load_documents_from_excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/tiempos.html#load_documents_from_excel"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#tiempos.load_documents_from_excel" title="Link to this definition">¶</a></dt>
+<dd><p>Carga y prepara documentos desde archivos Excel en un directorio.</p>
+<p>Para cada archivo .xlsx en el directorio:
+- Lee el archivo en un DataFrame.
+- Rellena valores vacíos con cadenas vacías.
+- Concatena todas las columnas en una única columna “content”.
+- Utiliza DataFrameLoader para extraer documentos.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): Ruta al directorio que contiene los archivos .xlsx.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list: Lista de objetos Documento preparados para indexar.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiempos.main">
+<span class="sig-prename descclassname"><span class="pre">tiempos.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/tiempos.html#main"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#tiempos.main" title="Link to this definition">¶</a></dt>
+<dd><p>Función principal que coordina la carga de datos, construcción de índice,
+ejecución de prompts contra múltiples modelos y guardado de resultados.</p>
+<p>Pasos:
+1) Cargar documentos desde Excel.
+2) Generar vectorstore FAISS y obtener un retriever.
+3) Definir modelos y prompts a ejecutar.
+4) Iterar cada modelo y prompt, medir el tiempo de ejecución.
+5) Guardar tiempos y respuestas en CSV y Markdown.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Generador de itinerarios formativos</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+<p class="caption" role="heading"><span class="caption-text">Sections</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#notebooks">Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-chat">Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documents.html">Documents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">Results</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="capítulo anterior">Welcome to TFG-IA-Itinerarios’s documentation!</a></li>
+      <li>Next: <a href="data.html" title="próximo capítulo">Data</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Esther M Quintero.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/code.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

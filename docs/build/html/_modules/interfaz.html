@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>interfaz &#8212; documentación de Generador de itinerarios formativos - 1</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=92345faf"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Código fuente para interfaz</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.document_loaders</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_ollama</span><span class="w"> </span><span class="kn">import</span> <span class="n">OllamaEmbeddings</span><span class="p">,</span> <span class="n">OllamaLLM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.vectorstores</span><span class="w"> </span><span class="kn">import</span> <span class="n">FAISS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.chains</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetrievalQA</span>
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># Módulo: interfaz.py</span>
+<span class="c1"># Descripción: Streamlit app para construir itinerarios formativos</span>
+<span class="c1">#              basados en selecciones de usuario y RetrievalQA</span>
+<span class="c1"># Autora: Esther M. Quintero</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+
+<span class="c1"># Constantes de configuración</span>
+<span class="n">DISTRIBUTIONS</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Resource type&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Actividad desenchufada&quot;</span><span class="p">,</span> <span class="s2">&quot;Programación visual&quot;</span><span class="p">,</span> <span class="s2">&quot;Actividad enchufada&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Curso&quot;</span><span class="p">,</span> <span class="s2">&quot;Vídeo&quot;</span><span class="p">,</span> <span class="s2">&quot;Dispositivos físicos&quot;</span><span class="p">,</span> <span class="s2">&quot;Programación textual&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Values&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Pensamiento crítico&quot;</span><span class="p">,</span> <span class="s2">&quot;Fomento de la creatividad y del espíritu científico&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Trabajo en equipo&quot;</span><span class="p">,</span> <span class="s2">&quot;Buen uso de las TIC&quot;</span><span class="p">,</span> <span class="s2">&quot;Convivencia y Educación Cívica&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Atención a la diversidad&quot;</span><span class="p">,</span> <span class="s2">&quot;Educación Ambiental y desarrollo sostenible&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Interculturalidad&quot;</span><span class="p">,</span> <span class="s2">&quot;Igualdad de Género&quot;</span><span class="p">,</span> <span class="s2">&quot;Educación para la Salud&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Fomento de la creatividad&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Key competences&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Aprender a Aprender&quot;</span><span class="p">,</span> <span class="s2">&quot;Competencia Matemática y en Ciencia y Tecnología&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Competencia Digital&quot;</span><span class="p">,</span> <span class="s2">&quot;Sociales y Cívicas&quot;</span><span class="p">,</span> <span class="s2">&quot;Comunicación Lingüística&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Plurilingüe&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Knowledge areas&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Informática y Robótica&quot;</span><span class="p">,</span> <span class="s2">&quot;Matemáticas&quot;</span><span class="p">,</span> <span class="s2">&quot;Ética&quot;</span><span class="p">,</span> <span class="s2">&quot;Lengua y Literatura&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Arte&quot;</span><span class="p">,</span> <span class="s2">&quot;Biología y Geología&quot;</span><span class="p">,</span> <span class="s2">&quot;Filosofía&quot;</span><span class="p">,</span> <span class="s2">&quot;Geografía e Historia&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Música&quot;</span><span class="p">,</span> <span class="s2">&quot;Deporte&quot;</span><span class="p">,</span> <span class="s2">&quot;Física&quot;</span><span class="p">,</span> <span class="s2">&quot;Tecnología&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Ciencias (Biología y Geología)&quot;</span><span class="p">,</span> <span class="s2">&quot;Física y Química&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Física (dentro de Biología y Geología)&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Cc concepts&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Algoritmia y Programación&quot;</span><span class="p">,</span> <span class="s2">&quot;Análisis de Datos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Impacto de la Computación&quot;</span><span class="p">,</span> <span class="s2">&quot;Sistemas Informáticos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Redes e Internet&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Ct skills&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Razonamiento Lógico&quot;</span><span class="p">,</span> <span class="s2">&quot;Descomposición&quot;</span><span class="p">,</span> <span class="s2">&quot;Evaluación&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pensamiento Algorítmico y Programación&quot;</span><span class="p">,</span> <span class="s2">&quot;Abstracción&quot;</span><span class="p">,</span> <span class="s2">&quot;Patrones&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Duration&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;Actividad Rápida (una sola clase)&quot;</span><span class="p">,</span> <span class="s2">&quot;Sesión (hasta 2 horas)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Semana (2-4 sesiones)&quot;</span><span class="p">,</span> <span class="s2">&quot;Mes (5-15 sesiones)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 Meses (15-30 sesiones)&quot;</span><span class="p">,</span> <span class="s2">&quot;Más de 3 Meses (Más de 30 sesiones)&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;School years&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;1º ESO&quot;</span><span class="p">,</span> <span class="s2">&quot;Tercer Ciclo EP&quot;</span><span class="p">,</span> <span class="s2">&quot;2º ESO&quot;</span><span class="p">,</span> <span class="s2">&quot;3º ESO&quot;</span><span class="p">,</span> <span class="s2">&quot;Segundo Ciclo EP&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;4º ESO&quot;</span><span class="p">,</span> <span class="s2">&quot;1º Bachillerato&quot;</span><span class="p">,</span> <span class="s2">&quot;2º Bachillerato&quot;</span><span class="p">,</span> <span class="s2">&quot;Primer Ciclo EP&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Educación Infantil&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Languages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Inglés&quot;</span><span class="p">,</span> <span class="s2">&quot;Español&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">MODEL_OPTIONS</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;gemma3:1b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;llama3.2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;phi3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;moondream&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;deepseek-r1:1.5b&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<div class="viewcode-block" id="load_documents_from_excel">
+<a class="viewcode-back" href="../code.html#interfaz.load_documents_from_excel">[documentos]</a>
+<span class="nd">@st</span><span class="o">.</span><span class="n">cache_data</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_documents_from_excel</span><span class="p">(</span><span class="n">directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Carga documentos de archivos Excel y genera una lista de documentos.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        directory (str): Ruta al directorio con archivos .xlsx.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Documentos extraídos con DataFrameLoader.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">documents</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.xlsx&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span>
+            <span class="p">),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">DataFrameLoader</span><span class="p">(</span>
+            <span class="n">dataframe</span><span class="p">,</span> <span class="n">page_content_column</span><span class="o">=</span><span class="s2">&quot;content&quot;</span>
+        <span class="p">)</span>
+        <span class="n">documents</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">documents</span></div>
+
+
+<div class="viewcode-block" id="build_chain">
+<a class="viewcode-back" href="../code.html#interfaz.build_chain">[documentos]</a>
+<span class="nd">@st</span><span class="o">.</span><span class="n">cache_resource</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_chain</span><span class="p">(</span><span class="n">_documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RetrievalQA</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construye la cadena RetrievalQA con FAISS y embeddings de Ollama.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        documents (list): Documentos a indexar.</span>
+<span class="sd">        model_name (str): Nombre del modelo Ollama.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RetrievalQA: Objeto configurado para consultas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">documents</span> <span class="o">=</span> <span class="n">_documents</span>
+    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OllamaEmbeddings</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;nomic-embed-text&quot;</span><span class="p">)</span>
+    <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="n">retriever</span> <span class="o">=</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">(</span><span class="n">search_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+    <span class="n">llm</span> <span class="o">=</span> <span class="n">OllamaLLM</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">RetrievalQA</span><span class="o">.</span><span class="n">from_chain_type</span><span class="p">(</span>
+        <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">retriever</span><span class="o">=</span><span class="n">retriever</span><span class="p">,</span>
+        <span class="n">return_source_documents</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_prompt">
+<a class="viewcode-back" href="../code.html#interfaz.build_prompt">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_prompt</span><span class="p">(</span><span class="n">selections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Genera el prompt en Español basado en las selecciones del usuario.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        selections (dict): Mapeo de categoría a opciones seleccionadas.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Prompt formateado para enviar al modelo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Genera un itinerario formativo que cumpla estos criterios:&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">opts</span> <span class="ow">in</span> <span class="n">selections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- **</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">**: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="s2">&quot;Sintetiza el programa en lista numerada, indicando duración y justificando &quot;</span>
+        <span class="s2">&quot;cada recurso. Incluye los enlaces de las actividades (columna &#39;URL&#39;) &quot;</span>
+        <span class="s2">&quot;y redacta en Español.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+<span class="c1"># Interfaz Streamlit</span>
+<span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;🧩 Constructor de Itinerarios Formativos&quot;</span><span class="p">)</span>
+
+<span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s2">&quot;Configuración del LLM&quot;</span><span class="p">)</span>
+<span class="n">selected_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+    <span class="s2">&quot;Selecciona el modelo de Ollama&quot;</span><span class="p">,</span>
+    <span class="n">MODEL_OPTIONS</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">MODEL_OPTIONS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;deepseek-r1:1.5b&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s2">&quot;Selecciona características&quot;</span><span class="p">)</span>
+<span class="n">user_selections</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">options</span> <span class="ow">in</span> <span class="n">DISTRIBUTIONS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">chosen</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">multiselect</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">category</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+    <span class="k">if</span> <span class="n">chosen</span><span class="p">:</span>
+        <span class="n">user_selections</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">chosen</span>
+
+<span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Generar Itinerario&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user_selections</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;🚨 Selecciona al menos una característica en la barra lateral.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">prompt_text</span> <span class="o">=</span> <span class="n">build_prompt</span><span class="p">(</span><span class="n">user_selections</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s2">&quot;🔍 Prompt generado&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">prompt_text</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s2">&quot;markdown&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invocando al modelo </span><span class="si">{</span><span class="n">selected_model</span><span class="si">}</span><span class="s2">…&quot;</span><span class="p">):</span>
+            <span class="n">docs</span> <span class="o">=</span> <span class="n">load_documents_from_excel</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">)</span>
+            <span class="n">qa_chain</span> <span class="o">=</span> <span class="n">build_chain</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">selected_model</span><span class="p">)</span>
+            <span class="n">raw_response</span> <span class="o">=</span> <span class="n">qa_chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">prompt_text</span><span class="p">)</span>
+
+        <span class="c1"># Extraer texto y limpiar etiquetas internas</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_response</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;result&quot;</span> <span class="ow">in</span> <span class="n">raw_response</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">raw_response</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">raw_response</span>
+
+        <span class="n">cleaned</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;&lt;think&gt;.*?&lt;/think&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">S</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s2">&quot;✍️ Respuesta del Modelo&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">cleaned</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Generador de itinerarios formativos</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+<p class="caption" role="heading"><span class="caption-text">Sections</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../documents.html">Documents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../results.html">Results</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Código de módulo</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Esther M Quintero.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
