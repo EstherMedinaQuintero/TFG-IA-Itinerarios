@@ -1,4 +1,4 @@
-# Generador de Itinerarios Formativos Personalizados con IA
+# Generador de itinerarios formativos personalizados con IA
 
 Este proyecto desarrolla una herramienta basada en inteligencia artificial para la generación automática de itinerarios formativos adaptados a diferentes niveles educativos, competencias y valores, utilizando una base de recursos clasificados mediante técnicas semiautomáticas.
 
@@ -43,8 +43,8 @@ Este proyecto desarrolla una herramienta basada en inteligencia artificial para 
 │   ├── plots/                                                                  # Gráficos estadísticos del dataset de recursos
 │   │   └── *.png                                                               # Categorías como duration, key_competences, etc.
 │   ├── resources/                                                              # Bases de datos originales de recursos educativos
-│   │   ├── ceibal.xlsx / codeorg.xlsx / restantes.xlsx / thetech.xlsx
-│   │   ├── enlaces.xlsx                                                        # Base de datos de URLs disponibles
+│   │   ├── ceibal.xlsx (...)
+│   │   ├── enlaces.xlsx                                                        # Clasificación cruda realizada por Elicit (sin las columnas de explicación)
 │   │   └── output.xlsx                                                         # Resultado de la asignación automática de enlaces
 │   ├── revision_sistematica_1.xlsx                                             # Clasificación realizada por la revisión sistemática 1
 │   ├── revision_sistematica_2.xlsx                                             # Clasificación realizada por la revisión sistemática 2
