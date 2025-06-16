@@ -4,85 +4,127 @@ Este proyecto desarrolla una herramienta basada en inteligencia artificial para 
 
 ---
 
-## 🎯 Objetivo
+## 📁 Estructura del repositorio
 
-Facilitar la personalización del aprendizaje en Ciencias de la Computación mediante:
-
-- Clasificación estructurada de recursos educativos abiertos.
-- Generación de itinerarios didácticos personalizados con modelos de lenguaje (LLMs).
-- Interfaz accesible para su uso por profesorado no técnico.
-- Evaluación rigurosa de la calidad pedagógica de las respuestas.
-
----
-
-## 🧱 Arquitectura del sistema
-
-El sistema se organiza en los siguientes módulos:
-
-- **`📂 data/`**: Contiene los datos clasificados y procesados para la generación de itinerarios.
-- **`📂 docs/`**: Documentación del proyecto generada con Sphinx.
-- **`📂 documents/`**: Recursos y evaluaciones utilizadas en el desarrollo del sistema.
-- **`📂 results/`**: Resultados obtenidos tras la evaluación de los modelos y tiempos de ejecución.
-- **`📂 code/scripts/`**: Scripts principales para la generación de itinerarios, interfaz y evaluación.
-- **`📂 code/notebooks/`**: Notebooks para análisis estadístico y columna de URLs.
-
-Archivos principales:
-
-- **`LICENSE`**: Información sobre la licencia del proyecto.
-- **`README.md`**: Este archivo, con información general del proyecto.
-- **`requirements.txt`**: Dependencias necesarias para ejecutar el sistema.
-
----
+```bash
+.
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── code/                                                                       # Código fuente del proyecto
+│   ├── notebooks/                                                              # Notebooks para análisis y procesamiento de datos
+│   │   ├── enlaces.ipynb                                                       # Asignación automática de URLs a recursos
+│   │   ├── enlaces.pdf                                                         # Exportación PDF del anterior
+│   │   ├── recursos_estadisticas.ipynb                                         # Análisis estadístico de recursos educativos
+│   │   └── recursos_estadisticas.pdf                                           # Exportación PDF del anterior
+│   └── scripts/                                                                # Scripts ejecutables
+│       ├── chat.py                                                             # Asistente conversacional con recuperación semántica
+│       ├── interfaz.py                                                         # Interfaz Streamlit inicial para generación de itinerarios
+│       ├── interfaz_estética.py                                                # Versión estética de la herramienta (RECOMENDACIÓN)
+│       ├── interfaz_optimizado.py                                              # Versión optimizada con caché y selección de modelo
+│       ├── prompts.py                                                          # Generador masivo de respuestas en Markdown
+│       ├── revision_sistematica.py                                             # Comparador entre revisiones y clasificación oficial
+│       ├── seleccion.py                                                        # Interfaz por terminal para crear prompts educativos
+│       ├── test.py                                                             # Prueba básica de conversación con LLM (modo consola)
+│       └── tiempos.py                                                          # Medición de tiempos de respuesta por modelo
+├── data/
+│   └── recursos_clasificados.xlsx                                              # Clasificación oficial de recursos (base de datos)
+├── docs/                                                                       # Documentación generada con Sphinx
+├── documents/                                                                  # Documentos estáticos y fijos para análisis
+│   ├── answers/                                                                # Respuestas generadas por distintos modelos en PDF
+│   │   ├── respuestas_coze.pdf
+│   │   ├── respuestas_deepseek.pdf
+│   │   ├── respuestas_gemma3.pdf
+│   │   ├── respuestas_googlecloud.pdf
+│   │   ├── respuestas_llama32.pdf
+│   │   └── respuestas_phi3.pdf
+│   ├── evaluacion_modelos.pdf                                                  # Evaluación cualitativa comparativa entre modelos
+│   ├── evaluacion_sistematica.csv                                              # Validación de etiquetas por categoría
+│   ├── plots/                                                                  # Gráficos estadísticos del dataset de recursos
+│   │   └── *.png                                                               # Categorías como duration, key_competences, etc.
+│   ├── resources/                                                              # Bases de datos originales de recursos educativos
+│   │   ├── ceibal.xlsx / codeorg.xlsx / restantes.xlsx / thetech.xlsx
+│   │   ├── enlaces.xlsx                                                        # Base de datos de URLs disponibles
+│   │   └── output.xlsx                                                         # Resultado de la asignación automática de enlaces
+│   ├── revision_sistematica_1.xlsx                                             # Clasificación realizada por la revisión sistemática 1
+│   ├── revision_sistematica_2.xlsx                                             # Clasificación realizada por la revisión sistemática 2
+│   └── rubrica.pdf                                                             # Rúbrica utilizada para evaluar las respuestas de modelos
+├── results/                                                                    # Resultados generados por los scripts
+│   ├── answers/                                                                # Respuestas en Markdown por modelo
+│   │   ├── respuestas_deepseek.md
+│   │   ├── respuestas_gemma.md
+│   │   ├── respuestas_llama32.md
+│   │   ├── respuestas_moondream.md
+│   │   └── respuestas_phi3.md
+│   ├── resultado_validacion.xlsx                                               # Informe de validación sistemática por recurso
+│   ├── resultados_tiempo.csv                                                   # Tiempos de respuesta de los modelos (formato tabla)
+│   └── resultados_tiempo.md                                                    # Tiempos de respuesta (formato legible Markdown)
+```
 
 ## 🚀 Instalación
 
 ### Requisitos previos
 
-- Python 3.10 o superior.
-- [Ollama](https://ollama.com/) instalado y configurado localmente.
-- Modelos ligeros compatibles (`phi3`, `gemma`, `llama3`, etc.).
+- Sistema operativo compatible (Windows preferiblemente)
+- [Ollama](https://ollama.com/) instalado y funcionando localmente
+- Python 3.10 o superior
 
-### Instrucciones
+### Instrucciones paso a paso
 
-1. Clona este repositorio:
+1. **Instala Ollama**  
+   
+Visita [https://ollama.com](https://ollama.com) y descarga el instalador para tu sistema operativo. Sigue las instrucciones oficiales para completar la instalación.
 
-    ```bash
-    git clone https://github.com/tu-usuario/tfg-itinerarios-ia.git
-    cd tfg-itinerarios-ia
-    ```
+2. **Prepara un entorno virtual de Python**
 
-2. Instala las dependencias:
+```bash
+python -m venv .venv
+```
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+3. **Activa el entorno virtual**
 
-3. Lanza la interfaz web:
+   * En Windows:
 
-    ```bash
-    streamlit run interfaz_optimizado.py
-    ```
+```bash
+.venv\Scripts\activate
+```
 
----
+4. **Descarga los modelos de Ollama que vas a usar**
+   
+Puedes hacerlo con el siguiente comando (repite para cada modelo necesario):
 
-## 🤖 Modelos utilizados
+```bash
+ollama pull nomic-embed-text
+ollama pull gemma:3b
+ollama pull phi3
+ollama pull llama3
+ollama pull deepseek
+ollama pull moondream
+```
 
-Los siguientes modelos se integran con Ollama y se ejecutan en local con un mínimo de 8GB de RAM:
+5. **Instala las dependencias del proyecto**
 
-- **`phi3`**
-- **`llama3.2`**
-- **`gemma3:1b`**
-- **`deepseek-r1:1.5b`**
-- **`moondream`**
+```bash
+pip install -r requirements.txt
+```
 
----
+6. **Ejecuta la interfaz web con Streamlit**
 
-## 📊 Evaluación del sistema
+```bash
+streamlit run code/scripts/interfaz_estetica.py
+```
 
-- **Validación de clasificación:** Revisión sistemática con un 70% de aciertos en la clasificación de recursos.
-- **Evaluación de itinerarios:** Aplicación de una rúbrica en 6 escenarios simulados.
-- **Modelo más robusto:** Coze (3.6/4), seguido de Gemma y Llama.
-- **Criterios valorados:** Tiempo de respuesta, precisión, formato, relevancia y robustez.
+### 📦 Modelos utilizados en el proyecto
+
+| Modelo               | Tamaño aproximado | Características principales                                        | Requisitos recomendados     |
+|----------------------|-------------------|--------------------------------------------------------------------|------------------------------|
+| `phi3`               | ~1.2 GB           | Muy rápido y ligero, ideal para tareas básicas                     | CPU moderna, ≥ 8 GB de RAM   |
+| `llama3.2`           | ~4.7 GB           | Buen equilibrio entre fluidez y contexto, multilingüe              | 12–16 GB de RAM (mejor con GPU) |
+| `gemma3:1b`          | ~2.8 GB           | Modelo multilingüe eficiente, buen rendimiento en tareas educativas| CPU o GPU, ≥ 8 GB de RAM     |
+| `deepseek-r1:1.5b`   | ~3.1 GB           | Robusto en razonamiento, algo más lento, útil en prompts complejos | CPU potente o GPU, ≥ 12 GB de RAM |
+| `moondream`          | ~800 MB           | Muy ligero, ideal para respuestas rápidas y entornos limitados     | CPU ligera, ≥ 6 GB de RAM    |
+
+> ⚠️ Algunos modelos pueden necesitar aceleración por GPU para obtener tiempos de respuesta óptimos. El sistema ha sido probado principalmente en CPU con 8GB de RAM.
 
 ---
 
